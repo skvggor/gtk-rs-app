@@ -1,5 +1,7 @@
-use gtk::{Application, Button, glib};
-use gtk::{ApplicationWindow, prelude::*};
+use gtk::{Application, ApplicationWindow, Button, glib, prelude::*};
+
+use std::cell::Cell;
+use std::rc::Rc;
 
 const APP_ID: &str = "org.gtk_rs.HelloWorld1";
 
@@ -22,8 +24,14 @@ fn build_ui(app: &Application) {
         .margin_start(100)
         .build();
 
-    button.connect_clicked(|button| {
-        button.set_label("Clicked!");
+    let counter = Rc::new(Cell::new(0));
+    let counter_clone = counter.clone();
+
+    button.connect_clicked(move |button| {
+        let new_value = counter_clone.get() + 1;
+        counter_clone.set(new_value);
+
+        button.set_label(&new_value.to_string());
     });
 
     let window = ApplicationWindow::builder()
